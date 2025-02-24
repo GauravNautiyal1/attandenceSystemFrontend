@@ -1,0 +1,25 @@
+.header {
+ grid-area: header;
+ background-color:#1d2634;
+ color:white;
+ height: 60px;
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ padding: 0 30px 0 30px;
+ box-shadow: 0 6px 7px -3px rgba(0, 0, 0, 0.35);
+}
+
+.menu-icon {
+ display: none;
+}
+.header-left input{
+ height:50px;
+ width:400px;
+ /* background-color: blue; */
+ background: transparent;
+ border:none;
+ outline:none;
+ color:#e6b0b0;
+ font-size:19px;
+}

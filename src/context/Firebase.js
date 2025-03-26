@@ -13,23 +13,13 @@ import {
 import { getDatabase, query, ref, set } from "firebase/database"; //create database
 import { collection, getFirestore, addDoc,setDoc, doc, getDocs, getDoc, updateDoc, where } from "firebase/firestore"; //create database
 
-// const firebaseConfig = {
-//   apiKey: "AIzaSyDB_OjRxtrLyK-_aqHCmDZACx25C2Fl6ME",
-//   authDomain: "app-1ffba.firebaseapp.com",
-//   databaseURL: "https://app-1ffba-default-rtdb.firebaseio.com",
-//   projectId: "app-1ffba",
-//   storageBucket: "app-1ffba.firebasestorage.app",
-//   messagingSenderId: "8134793793",
-//   appId: "1:8134793793:web:df8dc761b6a69abc2784c0",
-// };
 const firebaseConfig = {
-  apiKey: "AIzaSyDdSpN3iXR3xHRxvCENySOQGVvR1tu6yq0",
-  authDomain: "fir-fcb7a.firebaseapp.com",
-  projectId: "fir-fcb7a",
-  storageBucket: "fir-fcb7a.firebasestorage.app",
-  messagingSenderId: "147875796591",
-  appId: "1:147875796591:web:6a4201bd19fb3f53f09f9a",
-  measurementId: "G-TFKS7NYEFD"
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID
 };
 
 // instance

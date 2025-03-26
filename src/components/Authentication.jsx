@@ -1,78 +1,55 @@
-import { useState, useEffect } from 'react'
-import { Button, Table } from "react-bootstrap"
+import { useState, useEffect } from 'react';
+import { Button, Table } from "react-bootstrap";
 import "../CSS/Authentication.css";
-// import axios from 'axios';
+import { useFirebase } from '../context/Firebase';
 
-export default function Authentication() {
-  const [requests, setRequests] = useState([])
+export default function Authentication({ currentSemester, department }) {
+  const [requests, setRequests] = useState([]);
+  const { fetchUnauthorisedStudents, updateUserData } = useFirebase();
 
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/accounts/signup/');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+        const response = await fetchUnauthorisedStudents(department, currentSemester);
+        if (response.success) {
+          setRequests(response.data);
         }
-        const data = await response.json();
-        setRequests(data); // Update the state with the fetched data
       } catch (error) {
-        console.error('There was a problem with the fetch operation:', error);
+        console.error('Error fetching unauthorized students:', error);
       }
     };
 
     fetchRequests();
-  }, []);
+  }, [department, currentSemester, fetchUnauthorisedStudents]);
 
-  const getCSRFToken = () => {
-    const csrfToken = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("csrftoken="));
-    return csrfToken ? csrfToken.split("=")[1] : null;
-  };
-  
 
-  const handleAccept = async (id) => {
+  const handleAccept = async (rollNo, uid, branch, semester) => {
     try {
-      const csrfToken = getCSRFToken();
-      if (!csrfToken) {
-        throw new Error("CSRF token not found");
+      const response = await updateUserData(uid, true, rollNo, branch, semester);
+      if (response.success) {
+        setRequests(prevRequests => prevRequests.filter(request => request.uid !== uid));
       }
-  
-      const response = await fetch(`http://127.0.0.1:8000/accounts/approve-signup/${id}/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken,
-        },
-      });
-  
-      if (!response.ok) {
-        console.log(response)
-        throw new Error("Failed to approve the request");
-      }
-  
-      setRequests((prev) => prev.filter((req) => req.id !== id));
-      console.log(`Accepted request for user with id: ${id}`);
     } catch (error) {
+      console.error('Error approving student:', error);
     }
   };
-  
-  const handleReject = async (id) => {
-    try {
-      const response = await fetch(`http://127.0.0.1:8000/accounts/signup/${id}/`, {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to delete the request');
-      }
 
-      // Remove the rejected request from the local state
-      setRequests(prev => prev.filter(req => req.id !== id));
-      console.log(`Rejected and deleted request for user with id: ${id}`);
-      
+  const handleReject = async (rollNo, uid, branch, semester) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/delete_user/${uid}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" }
+      });
+  
+      const result = await response.json();
+      if (result.success) {
+        setRequests(prevRequests => prevRequests.filter(request => request.uid !== uid));
+        console.log(`User ${uid} has been deleted successfully.`);
+      } else {
+        console.error('Error deleting user:', result.error);
+      }
     } catch (error) {
-      console.error('There was a problem with the delete operation:', error);
+      console.error('Error rejecting student:', error);
     }
   };
 
@@ -84,41 +61,45 @@ export default function Authentication() {
           <tr>
             <th>Name</th>
             <th>Email</th>
-            <th>Role</th>
+            <th>Roll No</th>
             <th>Branch</th>
             <th>Semester</th>
-            <th>Age</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          {requests.length > 0 ? requests.map((request) => (
-            <tr key={request.id}>
-              <td>{request.first_name}  {request.last_name}</td>
-              <td>{request.Email}</td>
-              <td>{request.Roll_No}</td>
-              <td>{request.Branch}</td>
-              <td>{request.semester}</td>
-              <td>{request.Age}</td>
-              <td>
-                {/* <Button variant="success" onClick={() => handleAccept(request.id)}> */}
-                <Button variant="success" onClick={() => handleAccept(request.id)} >
-                  <a className="underline" href="http://127.0.0.1:8000/recognition/train_classifier/">
-                  Accept
-                  </a>
-                </Button>
-                <Button variant="danger" onClick={() => handleReject(request.id)}>
-                  Reject
-                </Button>
-              </td>
-            </tr>
-          )) : (
+          {requests.length > 0 ? (
+            requests.map((request) => (
+              <tr key={request.uid}>
+                <td>{request.name}</td>
+                <td>{request.email}</td>
+                <td>{request.rollNo}</td>
+                <td>{request.branch}</td>
+                <td>{request.semester}</td>
+                <td>
+                  <Button
+                    variant="success"
+                    onClick={() => handleAccept(request.rollNo, request.uid, request.branch, request.semester)}
+                  >
+                    Accept
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => handleReject(request.rollNo, request.uid, request.branch, request.semester)}
+                    className="ms-2"
+                  >
+                    Reject
+                  </Button>
+                </td>
+              </tr>
+            ))
+          ) : (
             <tr>
-              <td colSpan="7" className="text-center">No pending requests.</td>
+              <td colSpan="6" className="text-center">No pending requests.</td>
             </tr>
           )}
         </tbody>
       </Table>
     </div>
-  )
+  );
 }

@@ -6,16 +6,16 @@ import Authentication from "../components/Authentication";
 import AttendenceTable from "../components/AttendenceTable";
 import TakeAttendance from "../components/TakeAttendance";
 import { useLocation } from "react-router-dom";
+import FaceDetection from "../components/FaceRecognition";
 function TeaBody() {
   const [openSidebarToggle, setOpenSidebarToggle] = useState(false);
   const [selectedAction, setSelectedAction] = useState("home");
   const attendanceCount = 100;
   const location = useLocation();
-  const bra = location.state?.bra;
+  const branch = location.state?.branch;
 
   // const [currentSemester, setCurrentSemester] = useState("VI");
 
-  
   const [currentSemester, setCurrentSemester] = useState(() => {
     const savedSemester = localStorage.getItem("currentSemester");
     return savedSemester ? savedSemester : "V"; // Load from localStorage or default to "VI"
@@ -23,9 +23,8 @@ function TeaBody() {
 
   useEffect(() => {
     localStorage.setItem("currentSemester", currentSemester); // Save to localStorage
-    localStorage.setItem("department", bra); // Save to localStorage
+    localStorage.setItem("department", branch); // Save to localStorage
   }, [currentSemester]);
-  
 
   const OpenSidebar = () => {
     setOpenSidebarToggle(!openSidebarToggle);
@@ -37,16 +36,19 @@ function TeaBody() {
           <TeacherBody
             attendanceCount={attendanceCount}
             currentSemester={currentSemester}
-            department={bra}
-            
+            department={branch}
           />
         );
       case "Edit":
-        return <Authentication />;
+        return (
+          <Authentication currentSemester={currentSemester} department={branch} />
+        );
       case "SettingsPage":
         return <AttendenceTable />;
       case "TakeAttendance":
-        return <TakeAttendance />;
+        return (
+          <FaceDetection currentSemester={currentSemester} department={branch} />
+        );
       default:
         return <div>Select an action from the sidebar.</div>;
     }

@@ -9,26 +9,23 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [Validation, setValidation] = useState(localStorage.getItem("role") || false);
   const [role, setRole] = useState(localStorage.getItem("role") || "");
-  // const [studentdata, setStudentData] = useState(
-  //   localStorage.getItem("studentdata") || ""
-  // );
+
   const [studentdata, setStudentData] = useState(
     JSON.parse(localStorage.getItem("studentdata")) || {}
   );
-  const [bra, setBra] = useState(localStorage.getItem("bra") || "");
+  const [branch, setBranch] = useState(localStorage.getItem("branch") || "");
   const navigate = useNavigate();
   const firebase = useFirebase();
   useEffect(() => {
     if (firebase.isLoggedIn) {
-      if (role === "student") {
+      // console.log("firebase.isLoggedIn:",firebase.isLoggedIn)
+      if (role === "student"&&Validation) {
         // navigate("/Students/dashboard");
         navigate("/Students/dashboard", { state: { studentdata } });
-        console.log("Navigating with student data:", studentdata);
-
-        console.log("999999999", studentdata);
       } else if (role === "teacher") {
-        navigate("/Teachers/dashboard", { state: { bra } });
+        navigate("/Teachers/dashboard", { state: { branch } });
       } else {
         console.log("Unauthorized role detected.");
       }
@@ -45,37 +42,39 @@ function Login() {
         email,
         password
       );
-      console.log("Login successful:", result);
 
       if (result.user) {
-        // Fetch user data from Firestore
+        console.log(result.user);
         const userDoc = await firebase.fetchUserData(result.user.uid);
+        console.log("userDoc:", userDoc);
 
         if (userDoc.success && userDoc.data.role) {
-          const role = userDoc.data.role;
-          console.log("gaurav", userDoc.data);
+          const studentRole = userDoc.data.role;
           localStorage.setItem("studentdata", JSON.stringify(userDoc.data));
           setStudentData(userDoc.data);
-          localStorage.setItem("role", role);
+          localStorage.setItem("role", studentRole);
+          setRole(studentRole)
+          const studentValidation = userDoc.data.IsAuthorised;
+          console.log("studentValidation:", studentValidation);
+          localStorage.setItem("Validation", studentValidation);
+          setValidation(studentValidation);
 
-          if (role === "student") {
-            // navigate("/Students/dashboard", { state: { studentdata } });
-            // console.log("Navigating with student data:", studentdata);
 
-            // console.log("999999999", studentdata);
+          if (studentRole === "student"&&studentValidation) {
             navigate("/Students/dashboard", { state: { studentdata: userDoc.data } });
 
             
 
-          } else if (role === "teacher") {
-            const bra = userDoc.data.department;
-            localStorage.setItem("bra", bra);
-            navigate("/Teachers/dashboard", { state: { bra } });
+          } else if (studentRole === "teacher") {
+            const branch = userDoc.data.department;
+            localStorage.setItem("branch", branch);
+            navigate("/Teachers/dashboard", { state: { branch } });
           } else {
             setError("Unauthorized role detected.");
           }
         } else {
           setError("User role not found.");
+          firebase.LogoutUser();
         }
       }
     } catch (error) {

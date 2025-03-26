@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-// import { useLocation } from "react-router-dom";
 import "../CSS/Body.css";
 import Sidebar from "../components/Sidebar";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -18,8 +17,6 @@ function Body() {
   const [student, setStudent] = useState([]);
   const location = useLocation();
   const studentdata = location.state?.studentdata || {};
-  
-  console.log("00008888888000000", studentdata);
 
   // const [studentCount, setStudentsCount] = useState([0]);
 
@@ -52,7 +49,7 @@ function Body() {
       try {
         const response = await fetchSingleStudent(
           studentdata.Branch,
-          studentdata.Semester,
+          studentdata.semester,
           studentdata.Roll_No,
         );
         if (response) {

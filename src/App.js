@@ -9,8 +9,10 @@ import ProtectedRoute from "./panges/ProtectedRoute";
 import StudentList from "./components/Student";
 import TeacherSignIn from "./panges/TeacherSignIn";
 import FaceRecognition from "./components/FaceRecognition";
-import Profile from "./components/Profile";
+// import Profile from "./components/Profile";
 import ShowApplication from "./components/ShowApplication";
+import AttendanceTable from "./components/AttendenceTable";
+import FaceRegistration from "./components/FaceRegistration";
 
 function App() {
   return (
@@ -19,8 +21,10 @@ function App() {
       <Route path="/Login" element={<Login />} />
       <Route path="/signup" element={<SignIn />} />
       <Route path="/faced" element={<FaceRecognition />} />
-      <Route path="/profile" element={<Profile />} />
+      {/* <Route path="/profile" element={<Profile />} /> */}
       <Route path="/send" element={<ShowApplication />} />
+      <Route path="/demoooo" element={<FaceRegistration/>} />
+      <Route path="/attendanceTable" element={<AttendanceTable/>} />
       <Route path="/Teacher/signup" element={<TeacherSignIn/>} />
       <Route element={<ProtectedRoute/>}>
         <Route path="/Students/dashboard" element={<SDashboard />} />

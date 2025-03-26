@@ -14,6 +14,8 @@ function Teachersidebar({ openSidebarToggle, OpenSidebar, setSelectedAction }) {
 
   const handleLogout = async () => {
     await firebase.LogoutUser();
+    localStorage.clear();
+
     navigate("/login");
   };
 

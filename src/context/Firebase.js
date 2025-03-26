@@ -7,18 +7,29 @@ import {
   signInWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
+  updateProfile,
+  deleteUser,
 } from "firebase/auth"; //create user
-import { getDatabase, ref, set } from "firebase/database"; //create database
-import { collection, getFirestore, addDoc,setDoc, doc, getDocs, getDoc } from "firebase/firestore"; //create database
+import { getDatabase, query, ref, set } from "firebase/database"; //create database
+import { collection, getFirestore, addDoc,setDoc, doc, getDocs, getDoc, updateDoc, where } from "firebase/firestore"; //create database
 
+// const firebaseConfig = {
+//   apiKey: "AIzaSyDB_OjRxtrLyK-_aqHCmDZACx25C2Fl6ME",
+//   authDomain: "app-1ffba.firebaseapp.com",
+//   databaseURL: "https://app-1ffba-default-rtdb.firebaseio.com",
+//   projectId: "app-1ffba",
+//   storageBucket: "app-1ffba.firebasestorage.app",
+//   messagingSenderId: "8134793793",
+//   appId: "1:8134793793:web:df8dc761b6a69abc2784c0",
+// };
 const firebaseConfig = {
-  apiKey: "AIzaSyDB_OjRxtrLyK-_aqHCmDZACx25C2Fl6ME",
-  authDomain: "app-1ffba.firebaseapp.com",
-  databaseURL: "https://app-1ffba-default-rtdb.firebaseio.com",
-  projectId: "app-1ffba",
-  storageBucket: "app-1ffba.firebasestorage.app",
-  messagingSenderId: "8134793793",
-  appId: "1:8134793793:web:df8dc761b6a69abc2784c0",
+  apiKey: "AIzaSyDdSpN3iXR3xHRxvCENySOQGVvR1tu6yq0",
+  authDomain: "fir-fcb7a.firebaseapp.com",
+  projectId: "fir-fcb7a",
+  storageBucket: "fir-fcb7a.firebasestorage.app",
+  messagingSenderId: "147875796591",
+  appId: "1:147875796591:web:6a4201bd19fb3f53f09f9a",
+  measurementId: "G-TFKS7NYEFD"
 };
 
 // instance
@@ -40,14 +51,20 @@ export const FirebaseProvider = (props) => {
   // functions.......
 
   const [user, setUser] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   useEffect(() => {
     onAuthStateChanged(firebaseAuth, (user) => {
-      if (user) setUser(user);
+      if (user){
+        console.log("User logged in:", user);
+        setUser(user);
+        setIsLoggedIn(true);
+      }
       else setUser(null);
     });
   }, []);
+  
 
-    
 
 
   const singupUserWithEmailAndPassword = async (email, password,role,department) => {
@@ -57,8 +74,9 @@ export const FirebaseProvider = (props) => {
   
       await setDoc(doc(firestore, "users", user.uid), {
         email: user.email,
-        role: role, // Store role
-        department: department, // Store role
+        role,
+        department,
+        password,
       });
   
       return { success: true, user };
@@ -74,10 +92,11 @@ export const FirebaseProvider = (props) => {
   
       await setDoc(doc(firestore, "users", user.uid), {
         email: user.email,
-        role: role, // Store role
-        Branch: Branch, // Store role
-        Semester: semester, // Store role
-        Roll_No: Roll_No, // Store role
+        role,
+        Branch,
+        semester,
+        Roll_No,
+        IsAuthorised: false,
       });
   
       return { success: true, user };
@@ -91,11 +110,12 @@ export const FirebaseProvider = (props) => {
   const LoginUserWithEmailAndPassword = (email, password) => {
     return signInWithEmailAndPassword(firebaseAuth, email, password);
   };
-  const isLoggedIn = user ? true : false;
 
   const LogoutUser = async () => {
     try {
       await signOut(firebaseAuth);
+      setIsLoggedIn(false);
+      localStorage.setItem("role", null);
       console.log("User logged out");
     } catch (error) {
       console.error("Logout error:", error);
@@ -114,8 +134,7 @@ export const FirebaseProvider = (props) => {
 
   const putStudentData = async (branch, semester, rollNo, data) => {
     try {
-      // Firestore reference for the nested collection structure
-      const docRef = doc(firestore, `users/Students/${branch}/${semester}/students`, rollNo);
+      const docRef = doc(firestore, `Students/${branch}/${semester}`, rollNo);
       
       await setDoc(docRef, data);
   
@@ -134,10 +153,9 @@ export const FirebaseProvider = (props) => {
     }
   
     try {
-      // Correct Firestore reference with an even number of segments
-      const teacherDocRef = doc(firestore, `users/Teachers/${department}/${departmentId}`);
+      const teacherDocRef = doc(firestore, `Teachers/${department}`);
       
-      await setDoc(teacherDocRef, data, { merge: true }); // Merge to avoid overwriting
+      await setDoc(teacherDocRef, data, { merge: true });
   
       console.log(`Teacher data stored successfully at users/Teachers/${department}/${departmentId}`);
       return { success: true, id: departmentId };
@@ -147,6 +165,21 @@ export const FirebaseProvider = (props) => {
     }
   };
   
+  // const deleteUserAccount = async (uid) => {
+  //   const auth = getAuth();
+  //   const user = auth.currentUser; // Get the current authenticated user
+  
+  //   if (user && user.uid === uid) {
+  //     try {
+  //       await deleteUser(user);
+  //       return { success: true };
+  //     } catch (error) {
+  //       return { success: false, error: error.message };
+  //     }
+  //   } else {
+  //     return { success: false, error: "User not found or not authenticated." };
+  //   }
+  // };
   
   
   
@@ -155,11 +188,19 @@ export const FirebaseProvider = (props) => {
 
   const fetchAllStudents = async (branch, semester) => {
     try {
-      const studentsCollection = collection(firestore, `users/Students/${branch}/${semester}/students`);
+      console.log("fetching students from branch:", branch, "semester:", semester);
+      const studentsCollection = collection(firestore, `Students/${branch}/${semester}`);
+      // const studentsQuery = query(
+      //   studentsCollection,
+      //   where("Branch", "==", branch),
+      //   where("semester", "==", semester),
+      //   where("IsAuthorised", "==", false) // Fetch only unauthorised students
+      // );
       const studentSnapshot = await getDocs(studentsCollection);
       
       const students = studentSnapshot.docs.map((doc) => {
         const studentData = doc.data();
+        console.log("studentData",studentData)
         return {
           id: doc.id, // Roll number as document ID
           name: studentData.first_name + " " + studentData.last_name || "N/A",
@@ -168,6 +209,8 @@ export const FirebaseProvider = (props) => {
           semester: studentData.semester || "N/A",
           phone: studentData.phone || "N/A",
           address: studentData.address || "N/A",
+          IsAuthorised: studentData.IsAuthorised,
+          uid: studentData.uid || "N/A",
         };
       });
   
@@ -178,10 +221,56 @@ export const FirebaseProvider = (props) => {
     }
   };
 
+  const fetchUnauthorisedStudents = async (branch, semester) => {
+    try {
+      console.log("fetching students from branch:", branch, "semester:", semester);
+      const studentsCollection = collection(firestore, `Students/${branch}/${semester}`);
+      const studentsQuery = query(
+        studentsCollection,
+        where("Branch", "==", branch),
+        where("semester", "==", semester),
+        where("IsAuthorised", "==", false)
+      );
+      const studentSnapshot = await getDocs(studentsQuery);
+      
+      const students = studentSnapshot.docs.map((doc) => {
+        const studentData = doc.data();
+        console.log("studentData",studentData)
+        return {
+          id: doc.id,
+          name: studentData.first_name + " " + studentData.last_name || "N/A",
+          email: studentData.Email || "N/A",
+          branch: studentData.Branch || "N/A",
+          semester: studentData.semester || "N/A",
+          rollNo: studentData.Roll_No || "N/A",
+          address: studentData.address || "N/A",
+          IsAuthorised: studentData.IsAuthorised,
+          uid: studentData.uid || "N/A",
+        };
+      });
+  
+      return { success: true, data: students };
+    } catch (error) {
+      console.error("Error fetching students:", error);
+      return { success: false, message: error.message };
+    }
+  };
+
+  const updateUserData = async (UID, value,Roll_No,branch,semester) => {
+    console.log("UID",UID,"value",value,"Roll_No",Roll_No,"branch",branch,"semester",semester);
+      try {
+        await updateDoc(doc(firestore, "users", UID), { IsAuthorised: value });
+        await updateDoc(doc(firestore, `Students/${branch}/${semester}`, Roll_No), { IsAuthorised: value });
+        console.log(`Document successfully updated at: users/${UID}`);
+        return { success: true, id: UID };
+      } catch (error) {
+        console.error(`Error updating IsAuthorised`, error.message);
+      }
+  };
+
   const fetchSingleStudent = async (branch, semester, studentId) => {
     try {
-      // Reference to a specific student document
-      const studentRef = doc(firestore, `users/Students/${branch}/${semester}/students/${studentId}`);
+      const studentRef = doc(firestore, `Students/${branch}/${semester}/${studentId}`);
       const studentSnapshot = await getDoc(studentRef);
   
       if (studentSnapshot.exists()) {
@@ -221,9 +310,10 @@ export const FirebaseProvider = (props) => {
         return { success: false, message: "User not found!" };
       }
     } catch (error) {
-      return { success: false, message: error.message };
+      return { success: false, message:error.message };
     }
   };
+
   const fetchStudentData = async (branch, semester, rollNo) => {
     try {
       // Reference to the student's document
@@ -255,9 +345,12 @@ export const FirebaseProvider = (props) => {
         isLoggedIn,
         LogoutUser,
         resetPassword,
+        updateUserData,
         putStudentData,
         putTeacherData,
         fetchAllStudents,
+        fetchUnauthorisedStudents,
+        // deleteUserAccount,
         fetchUserData,
         fetchStudentData,
         fetchSingleStudent,

@@ -14,7 +14,7 @@ function SignIn() {
   const [image, setImage] = useState(null);
   const [Email, setEmail] = useState("");
   const [Age, setAge] = useState("");
-  const [role, setRole] = useState("student");
+  const role="student";
   const [create_password, setCreate_password] = useState("");
   const [confirm_password, setConfirm_password] = useState("");
 
@@ -34,19 +34,18 @@ function SignIn() {
     setConfirm_password("");
   };
   useEffect(() => {
-    console.log(image);
     if (firebase.isLoggedIn) {
-      navigate("/Students/dashboard");
+      navigate("/Login");
     }
-  }, [firebase, navigate,image]);
+  }, [firebase, navigate]);
 
   const handleShow = () => setShow(true);
+
   const handleClose = () => {
     setShow(false);
     resetForm();
   };
 
-  // Handle user signup
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (create_password !== confirm_password) {
@@ -66,7 +65,7 @@ function SignIn() {
 
       if (result.user) {
         await firebase.putStudentData(Branch, semester, Roll_No, {
-          uid: result.user.uid, // Unique user ID
+          uid: result.user.uid, 
           first_name,
           last_name,
           Roll_No,
@@ -75,9 +74,9 @@ function SignIn() {
           Email,
           Age,
           role,
+          IsAuthorised: false,
         });
 
-        console.log("User registered & data stored successfully");
         handleShow();
       }
     } catch (error) {
@@ -229,10 +228,6 @@ function SignIn() {
                       placeholder="Confirm Password"
                     />
                   </div>
-                  {/* <select value={role} onChange={(e) => setRole(e.target.value)} required>
-          <option value="student">Student</option>
-          <option value="teacher">Teacher</option>
-        </select> */}
                 </div>
 
                 <div className="Signup_btn_box">
@@ -241,8 +236,6 @@ function SignIn() {
                   </button>
                 </div>
               </div>
-
-              {/* Footer Links */}
               <div className="Forget_Signup">
                 <div className="Forget">
                   <Link className="anchor" to="/forget">

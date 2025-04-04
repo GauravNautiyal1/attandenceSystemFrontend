@@ -1,35 +1,33 @@
 import React from "react";
-import Image from "../Images/profilePicture.png";
-// import { Link} from "react-router-dom";
-
+import { useNavigate } from "react-router-dom";
 import {
   BsGrid1X2Fill,
-  BsFillGearFill,
   BsPeopleFill,
+  BsFillDatabaseFill,
   BsFillBandaidFill,
-  BsFillHandIndexThumbFill
-  
 } from "react-icons/bs";
 import "../CSS/Sidebar.css";
 import { useFirebase } from "../context/Firebase";
-import { useNavigate } from "react-router-dom";
-import Profile from "./Profile";
-function Sidebar({ openSidebarToggle, OpenSidebar, setSelectedAction }) {
+function Adminsidebar({ openSidebarToggle, OpenSidebar, setSelectedAction }) {
   const firebase = useFirebase();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     await firebase.LogoutUser();
+    localStorage.clear();
+
     navigate("/login");
   };
+
   return (
     <aside
       id="sidebar"
       className={openSidebarToggle ? "sidebar-responsive" : ""}
     >
-      {/* opensidebartoggle? means if it is true than change the class name to sidebar-responsive */}
       <div className="sidebar-title">
-        <div className="sidebar-brand">Atendify</div>
+        <div className="sidebar-brand">
+          <p className="success">Atendify</p>
+        </div>
         <span className="icon close_icon" onClick={OpenSidebar}>
           X
         </span>
@@ -44,16 +42,21 @@ function Sidebar({ openSidebarToggle, OpenSidebar, setSelectedAction }) {
         </li>
         <li
           className="sidebar-list-item"
-          onClick={() => setSelectedAction("profile")}
+          onClick={() => setSelectedAction("Edit")}
         >
-          <BsPeopleFill className="icon" />
-          Profile
+          <BsGrid1X2Fill className="icon" /> Edit
         </li>
+
         <li
           className="sidebar-list-item"
-          onClick={() => setSelectedAction("demo")}
+          onClick={() => setSelectedAction("AddTeachers")}
         >
-          <BsFillHandIndexThumbFill className="icon" /> Leave Application
+          <BsPeopleFill className="icon" /> Add Teachers
+        </li>
+        <li className="sidebar-list-item">
+          <a href="http://127.0.0.1:8000/admin/">
+            <BsFillDatabaseFill className="icon" /> Manage Database
+          </a>
         </li>
         <li
           className="sidebar-list-item"
@@ -67,4 +70,4 @@ function Sidebar({ openSidebarToggle, OpenSidebar, setSelectedAction }) {
   );
 }
 
-export default Sidebar;
+export default Adminsidebar;

@@ -54,10 +54,11 @@ function Teachersidebar({ openSidebarToggle, OpenSidebar, setSelectedAction }) {
         >
           <BsCalendarCheckFill className="icon" /> Take Attendence
         </li>
-        <li className="sidebar-list-item">
-          <a href="http://127.0.0.1:8000/admin/">
-            <BsFillDatabaseFill className="icon" /> Manage Database
-          </a>
+        <li
+          className="sidebar-list-item"
+          onClick={() => setSelectedAction("leave")}
+        >
+          <BsFillDatabaseFill className="icon" /> Leave Application
         </li>
         <li
           className="sidebar-list-item"

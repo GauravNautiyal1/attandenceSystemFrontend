@@ -5,14 +5,16 @@ import TeacherBody from "../components/TeacherBody";
 import Authentication from "../components/Authentication";
 import AttendenceTable from "../components/AttendenceTable";
 import TakeAttendance from "../components/TakeAttendance";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import FaceDetection from "../components/FaceRecognition";
+import LeaveApplication from "../components/LeaveApplication.jsx";
 function TeaBody() {
   const [openSidebarToggle, setOpenSidebarToggle] = useState(false);
   const [selectedAction, setSelectedAction] = useState("home");
   const attendanceCount = 100;
   const location = useLocation();
   const branch = location.state?.branch;
+  const navigate = useNavigate();
 
   // const [currentSemester, setCurrentSemester] = useState("VI");
 
@@ -48,6 +50,11 @@ function TeaBody() {
       case "TakeAttendance":
         return (
           <FaceDetection currentSemester={currentSemester} department={branch} />
+          // navigate("/faced");
+        );
+      case "leave":
+        return (
+          <LeaveApplication currentSemester={currentSemester} department={branch} />
         );
       default:
         return <div>Select an action from the sidebar.</div>;

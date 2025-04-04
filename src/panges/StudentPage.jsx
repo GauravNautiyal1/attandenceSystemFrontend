@@ -38,7 +38,7 @@ function Body() {
           />
         );
       case "none":
-        return <ShowApplication applicationData={applicationData} />;
+        return <ShowApplication applicationData={applicationData} student={student} />;
       default:
         return <div>Select an action from the sidebar.</div>;
     }

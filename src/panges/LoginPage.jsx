@@ -73,7 +73,7 @@ function Login() {
             setError("Unauthorized role detected.");
           }
         } else {
-          setError("User role not found.");
+          setError("You are rejected by admin");
           firebase.LogoutUser();
         }
       }

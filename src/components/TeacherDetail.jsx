@@ -3,14 +3,14 @@ import { Button, Table } from "react-bootstrap";
 import "../CSS/Authentication.css";
 import { useFirebase } from '../context/Firebase';
 
-export default function Authentication({ currentSemester, department }) {
+export default function TeacherDetail({ currentSemester, department }) {
   const [requests, setRequests] = useState([]);
-  const { fetchUnauthorisedStudents, updateUserData ,deleteUserData} = useFirebase();
+  const { fetchAllTeacher, updateUserData ,deleteUserData} = useFirebase();
 
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const response = await fetchUnauthorisedStudents(department, currentSemester);
+        const response = await fetchAllTeacher("Information Technology");
         if (response.success) {
           setRequests(response.data);
         }
@@ -20,7 +20,7 @@ export default function Authentication({ currentSemester, department }) {
     };
 
     fetchRequests();
-  }, [department, currentSemester, fetchUnauthorisedStudents]);
+  }, [department, currentSemester]);
 
 
   const handleAccept = async (rollNo, uid, branch, semester) => {
@@ -51,11 +51,9 @@ export default function Authentication({ currentSemester, department }) {
       <Table striped bordered hover responsive>
         <thead>
           <tr>
-            <th>Name</th>
+            <th>department</th>
             <th>Email</th>
-            <th>Roll No</th>
-            <th>Branch</th>
-            <th>Semester</th>
+            <th>departmentId</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -63,11 +61,9 @@ export default function Authentication({ currentSemester, department }) {
           {requests.length > 0 ? (
             requests.map((request) => (
               <tr key={request.uid}>
-                <td>{request.name}</td>
+                <td>{request.department}</td>
                 <td>{request.email}</td>
-                <td>{request.rollNo}</td>
-                <td>{request.branch}</td>
-                <td>{request.semester}</td>
+                <td>{request.departmentId}</td>
                 <td>
                   <Button
                     variant="success"

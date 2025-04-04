@@ -1,18 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
 import beepSound from "../Images/beep.wav";
 
-const FaceDetection = ({currentSemester ,department}) => {
+const FaceDetection = ({ currentSemester, department }) => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [ws, setWs] = useState(null);
   const beepAudio = new Audio(beepSound);
   const [isDetecting, setIsDetecting] = useState(false);
   const [intervalId, setIntervalId] = useState(null);
+  const [cameraStream, setCameraStream] = useState(null);
 
   useEffect(() => {
-    const websocket = new WebSocket(`ws://localhost:8000/detect-face/${department}/${currentSemester}`);
-    // const websocket = new WebSocket(`wss://facedetection-2-blek.onrender.com/detect-face/${department}/${currentSemester}`);
-    console.log(department,"  ",currentSemester)
+    const websocket = new WebSocket(
+      `ws://localhost:8000/detect-face/${department}/${currentSemester}`
+    );
+    console.log(department, "  ", currentSemester);
     setWs(websocket);
 
     websocket.onmessage = (event) => {
@@ -24,18 +26,78 @@ const FaceDetection = ({currentSemester ,department}) => {
         }
       });
     };
+
     return () => websocket.close();
   }, []);
 
-  const toggleDetection = () => {
+  const toggleDetection = async () => {
     if (isDetecting) {
       clearInterval(intervalId);
       setIntervalId(null);
       setIsDetecting(false);
+      stopCamera();
+  
+      // Close WebSocket connection when stopping detection
+      if (ws) {
+        ws.onmessage = null;  // Remove message listener
+        ws.close();
+        setWs(null);
+      }
     } else {
-      const id = setInterval(captureFrame, 10000);
+      await startCamera();
+      
+      // Reinitialize WebSocket connection
+      const websocket = new WebSocket(
+        `ws://localhost:8000/detect-face/${department}/${currentSemester}`
+      );
+      setWs(websocket);
+  
+      websocket.onmessage = (event) => {
+        const response = JSON.parse(event.data);
+        if (response.faces && Array.isArray(response.faces)) {
+          drawBoundingBoxes(response.faces);
+          response.faces.forEach((face) => {
+            if (face.name !== "Unknown") {
+              beepAudio.play();
+            }
+          });
+        }
+      };
+  
+      websocket.onclose = () => {
+        console.log("WebSocket closed");
+      };
+  
+      websocket.onerror = (error) => {
+        console.error("WebSocket error:", error);
+      };
+  
+      const id = setInterval(captureFrame, 1000);
       setIntervalId(id);
       setIsDetecting(true);
+    }
+  };
+  
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+      setCameraStream(stream);
+    } catch (error) {
+      console.error("Error accessing webcam:", error);
+    }
+  };
+
+  const stopCamera = () => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach((track) => track.stop()); // Stop all tracks
+      setCameraStream(null);
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null; // Remove video source
     }
   };
 
@@ -69,14 +131,6 @@ const FaceDetection = ({currentSemester ,department}) => {
     });
   };
 
-  useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-    });
-  }, []);
-
   return (
     <div
       style={{
@@ -106,14 +160,13 @@ const FaceDetection = ({currentSemester ,department}) => {
           ref={videoRef}
           autoPlay
           playsInline
-          style={{ width: "100%", height: "100%" , transform: "scaleX(-1)"}}
+          style={{ width: "100%", height: "100%", transform: "scaleX(-1)" }}
         />
         <canvas
           ref={canvasRef}
           width="640"
           height="480"
           style={{ position: "absolute", top: 0, left: 0 }}
-          
         />
       </div>
 

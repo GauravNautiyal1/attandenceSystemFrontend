@@ -1,17 +1,20 @@
 .mainContainer {
- height: 100vh;
  display: grid;
  place-items: center;
+ min-height: 86vh;
+ /* min-height: 100vh; */
  background-image: url("../Images/realistic-style-technology-particle-background_23-2148426704.avif");
  background-size: cover;
  background-position: center;
- font-family: Roboto;
+ font-family: Roboto, sans-serif;
  background-repeat: no-repeat;
+ padding: 20px;
 }
 
 .ContainerSignin {
  padding: 30px 40px;
- width: 40%; /* Increased Width */
+ width: 100%;
+ max-width: 500px; /* Adjusts for larger screens */
  background-color: white;
  border-radius: 25px;
  background-image: url("../Images/pngtree-simple-white-flat-vectors-with-diagonal-cuts-decorative-backdrops-for-your-image_597614.jpg");
@@ -34,8 +37,8 @@
 }
 
 .Content h1 {
- margin-top: 20px;
- font-size: 32px;
+ margin-top: 10px;
+ font-size: 28px;
  font-weight: 800;
  color: rgb(49, 8, 106);
 }
@@ -43,22 +46,25 @@
 .inputContainer {
  display: flex;
  flex-direction: column;
- gap: 15px;
- margin-top: 25px;
+ gap: 12px;
+ margin-top: 20px;
 }
 
 .inputRow {
  display: flex;
+ flex-wrap: wrap;
  justify-content: space-between;
+ gap: 10px;
 }
 
 .inputGroup {
  flex: 1;
+ min-width: 45%;
  text-align: left;
 }
 
 label {
- font-size: 18px;
+ font-size: 16px;
  font-weight: 500;
  color: rgb(55, 52, 52);
 }
@@ -68,7 +74,7 @@ label {
  padding: 10px;
  border: 2px solid gray;
  border-radius: 8px;
- font-size: 18px;
+ font-size: 16px;
  outline: none;
 }
 
@@ -79,14 +85,14 @@ input:focus {
 
 .signupBtnContainer {
  text-align: center;
- margin-top: 30px;
+ margin-top: 20px;
 }
 
 .signupBtn {
  width: 100%;
  padding: 12px;
  border-radius: 10px;
- font-size: 20px;
+ font-size: 18px;
  font-weight: 700;
  color: white;
  background-color: rgb(136, 74, 223);
@@ -106,8 +112,9 @@ input:focus {
 .linkContainer {
  display: flex;
  justify-content: space-between;
- margin-top: 20px;
- font-size: 16px;
+ flex-wrap: wrap;
+ margin-top: 15px;
+ font-size: 14px;
  font-weight: 500;
 }
 
@@ -118,4 +125,50 @@ input:focus {
 
 .linkContainer a:hover {
  color: rgb(87, 31, 128);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+ .ContainerSignin {
+   padding: 20px;
+   max-width: 90%;
+ }
+
+ .Content h1 {
+   font-size: 24px;
+ }
+
+ .inputRow {
+   flex-direction: column;
+ }
+
+ .inputGroup {
+   min-width: 100%;
+ }
+
+ .signupBtn {
+   font-size: 16px;
+   padding: 10px;
+ }
+
+ .linkContainer {
+   flex-direction: column;
+   text-align: center;
+   gap: 10px;
+ }
+}
+
+@media (max-width: 480px) {
+ .ContainerSignin {
+   padding: 15px;
+ }
+
+ .Content h1 {
+   font-size: 22px;
+ }
+
+ .signupBtn {
+   font-size: 14px;
+   padding: 8px;
+ }
 }

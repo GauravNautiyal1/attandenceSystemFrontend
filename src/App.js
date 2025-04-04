@@ -7,12 +7,14 @@ import TDashboard from "./panges/TeacherPage";
 import ForgetPassword from "./panges/ForgetPage";
 import ProtectedRoute from "./panges/ProtectedRoute";
 import StudentList from "./components/Student";
-import TeacherSignIn from "./panges/TeacherSignIn";
+// import TeacherSignIn from "./panges/TeacherSignIn";
 import FaceRecognition from "./components/FaceRecognition";
 // import Profile from "./components/Profile";
 import ShowApplication from "./components/ShowApplication";
 import AttendanceTable from "./components/AttendenceTable";
 import FaceRegistration from "./components/FaceRegistration";
+import AdminDashboard from "./panges/AdminDashboard";
+import PDFViewer from "./components/PDFViewer";
 
 function App() {
   return (
@@ -25,7 +27,9 @@ function App() {
       <Route path="/send" element={<ShowApplication />} />
       <Route path="/demoooo" element={<FaceRegistration/>} />
       <Route path="/attendanceTable" element={<AttendanceTable/>} />
-      <Route path="/Teacher/signup" element={<TeacherSignIn/>} />
+      {/* <Route path="/Teacher/signup" element={<TeacherSignIn/>} /> */}
+        <Route path="/Admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/view-pdf" element={<PDFViewer />} />
       <Route element={<ProtectedRoute/>}>
         <Route path="/Students/dashboard" element={<SDashboard />} />
         <Route path="/Teachers/dashboard" element={<TDashboard />} />

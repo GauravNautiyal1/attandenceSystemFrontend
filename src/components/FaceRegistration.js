@@ -46,12 +46,12 @@ const FaceRegistration = () => {
     formData.append("name", name);
     console.log(name);
     formData.append("branch", "Information Technology");
-    formData.append("semester", "VI");
+    formData.append("semester", "IV");
     formData.append("file", capturedImage, `${name}.jpg`);
 
     try {
-      // const response = await axios.post("https://facedetection-2-blek.onrender.com/register-face/", formData);
-      const response = await axios.post("http://127.0.0.1:8000/register-face/", formData);
+      const response = await axios.post("https://facedetection-2-blek.onrender.com/register-face/", formData);
+      // const response = await axios.post("http://127.0.0.1:8000/register-face/", formData);
       console.log(response)
       setMessage(`${response.data.message}`);            
     } catch (error) {

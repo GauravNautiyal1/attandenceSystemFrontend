@@ -5,59 +5,13 @@ import {
   BsFillGrid3X3GapFill,
   BsPeopleFill,
 } from "react-icons/bs";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-} from "recharts";
 import "../CSS/Body.css";
 import { Link } from "react-router-dom";
 import { useFirebase } from "../context/Firebase";
 
 function Teacherhome({ attendanceCount, currentSemester ,department}) {
 
-  const [monthData, setMonthData] = useState([
-    { name: "January", pv: 0 },
-    { name: "February", pv: 0 },
-    { name: "March", pv: 0 },
-    { name: "April", pv: 0 },
-    { name: "May", pv: 0 },
-    { name: "June", pv: 0 },
-    { name: "July", pv: 0 },
-    { name: "August", pv: 0 },
-    { name: "September", pv: 0 },
-    { name: "October", pv: 0 },
-    { name: "November", pv: 0 },
-    { name: "December", pv: 0 },
-  ]);
 
-  const [weeklyData, setWeeklyData] = useState([
-    { name: "Monday", pv: 0 },
-    { name: "Tuesday", pv: 0 },
-    { name: "Wednesday", pv: 0 },
-    { name: "Thursday", pv: 0 },
-    { name: "Friday", pv: 0 },
-    { name: "Saturday", pv: 0 },
-    { name: "Sunday", pv: 0 },
-  ]);
-
-  // Fetch monthly attendance data
-  const fetchMonthlyAttendanceData = async () => {
-    alert("hello");
-  };
-
-  // Fetch weekly attendance data
-  const fetchWeeklyAttendanceData = async () => {
-    alert(" fetchWeeklyAttendanceDat");
-  };
-  
     const { fetchAllStudents } = useFirebase();
     const [students, setStudents] = useState([]);
     const [studentCount,setStudentsCount]=useState([0]);
@@ -127,50 +81,6 @@ function Teacherhome({ attendanceCount, currentSemester ,department}) {
         </div>
       </div>
 
-      {/* <div className="Tcharts">
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart
-            data={weeklyData}
-            margin={{
-              top: 5,
-              right: 30,
-              left: 20,
-              bottom: 5,
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="pv" fill="#8884d8" />
-          </BarChart>
-        </ResponsiveContainer>
-
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart
-            data={monthData}
-            margin={{
-              top: 5,
-              right: 30,
-              left: 20,
-              bottom: 5,
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="pv"
-              stroke="#8884d8"
-              activeDot={{ r: 8 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div> */}
     </main>
   );
 }

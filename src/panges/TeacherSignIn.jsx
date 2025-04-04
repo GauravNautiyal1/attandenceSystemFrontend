@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Modal, Button } from "react-bootstrap";
-import styles from "../CSS/TeacherSignup.module.css";
-import "../CSS/LoginStyle.css";
+import styles from "../CSS/TeacherSignup.module.css";  // Correct import
 import { useFirebase } from "../context/Firebase";
 
 function TeacherSignIn() {
@@ -12,9 +11,9 @@ function TeacherSignIn() {
   const [email, setEmail] = useState("");
   const [createPassword, setCreatePassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [role, setRole] = useState("teacher");
-
+  const [role] = useState("teacher");
   const [show, setShow] = useState(false);
+
   const navigate = useNavigate();
   const firebase = useFirebase();
 
@@ -25,12 +24,6 @@ function TeacherSignIn() {
     setCreatePassword("");
     setConfirmPassword("");
   };
-
-  useEffect(() => {
-    if (firebase.isLoggedIn) {
-      navigate("/Teachers/dashboard");
-    }
-  }, [firebase, navigate]);
 
   const handleShow = () => setShow(true);
   const handleClose = () => {
@@ -44,20 +37,17 @@ function TeacherSignIn() {
       alert("Passwords do not match!");
       return;
     }
-  
+
     try {
-      const result = await firebase.singupUserWithEmailAndPassword(email, createPassword,role,department);
+      const result = await firebase.singupUserWithEmailAndPassword(email, createPassword, role, department);
       if (result.user) {
-        const teacherId = result.user.uid; 
-  
         const teacherData = {
-          uid: teacherId,
+          uid: result.user.uid,
           department,
           departmentId,
           email,
         };
-  
-        // Use department name to store teacher data properly
+
         await firebase.putTeacherData(department, departmentId, teacherData);
         console.log("Teacher registered & data stored successfully");
         handleShow();
@@ -67,12 +57,11 @@ function TeacherSignIn() {
       alert(error.message);
     }
   };
-  
-  
+
   return (
-    <div className="mainContainer">
-      <div className="ContainerSignin">
-        <div className="Content">
+    <div className={styles.mainContainer}>
+      <div className={styles.ContainerSignin}>
+        <div className={styles.Content}>
           <form onSubmit={handleSubmit} className={styles.signupPage}>
             <h1>Teacher Sign-Up</h1>
             <div className={styles.data}>
@@ -88,7 +77,7 @@ function TeacherSignIn() {
                     placeholder="Select Department"
                   />
                   <datalist id="Department">
-                    {["Information Technology", "Computer Science Engineering", "Mechanical", "Civil Engineering","Auto Mechanical", "Electronics"].map((dept) => (
+                    {["Information Technology", "Computer Science Engineering", "Mechanical", "Civil Engineering", "Auto Mechanical", "Electronics"].map((dept) => (
                       <option key={dept} value={dept} />
                     ))}
                   </datalist>
@@ -104,7 +93,7 @@ function TeacherSignIn() {
                   />
                 </div>
               </div>
-              
+
               <div className={styles.tEmail}>
                 <label>Email</label>
                 <input
@@ -115,7 +104,7 @@ function TeacherSignIn() {
                   placeholder="Enter Email"
                 />
               </div>
-              
+
               <div className={styles.createConfirm}>
                 <div className={styles.createPass}>
                   <label>Create Password</label>
@@ -138,20 +127,12 @@ function TeacherSignIn() {
                   />
                 </div>
               </div>
-              
-              <div className="Signup_btn_box">
-                <button type="submit" id="button" className="Sign_Up">Sign up</button>
+
+              <div className={styles.Signup_btn_box}>
+                <button type="submit" className={styles.Sign_Up}>Sign up</button>
               </div>
             </div>
-            
-            <div className="Forget_Signup">
-              <div className="forget">
-                <Link className="anchor" to="/forget">Forgotten account?</Link>
-              </div>
-              <div className={styles.signup}>
-                <Link className="anchor" to="/">Login</Link>
-              </div>
-            </div>
+
           </form>
         </div>
       </div>
